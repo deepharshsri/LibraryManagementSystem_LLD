@@ -6,5 +6,6 @@ package com.Deepansh.LibraryManagementSystem;
 public enum BookStatus {
 
     AVAILABLE,
-    NOT_AVAILABLE
+    NOT_AVAILABLE,
+    AVAILABLE_LATE
 }

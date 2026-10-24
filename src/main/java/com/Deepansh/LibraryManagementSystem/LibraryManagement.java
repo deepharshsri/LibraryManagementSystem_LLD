@@ -23,7 +23,7 @@ public class LibraryManagement {
 
     public boolean canBorrow(String userId,String bookId){ 
 
-       Map<String,LocalDate> borrowedBooks = um.borrowedBooksbyUser.containsKey(userId) ? um.borrowedBooksbyUser.get(userId):new HashMap<>();
+       Map<String,LocalDate> borrowedBooks = um.borrowedBooksbyUser.computeIfAbsent(bookId, k-> new HashMap<>());
        if(getBookStatus(bookId)==BookStatus.NOT_AVAILABLE||borrowedBooks.containsKey(bookId)){
         return false;
     }
@@ -34,9 +34,8 @@ public class LibraryManagement {
     public void issueBook(String userId, String bookId){
         um.addBookToUserList(bookId, userId);
         bm.decreaseQuantity(bookId, 1);
-        Map<String,LocalDate> list=borrowerListByBookId.containsKey(bookId)? borrowerListByBookId.get(userId):new HashMap<>();
-        list.put(userId,LocalDate.now());
-        borrowerListByBookId.put(bookId,list);
+       borrowerListByBookId.computeIfAbsent(bookId,k->new HashMap<>()).put(userId,LocalDate.now());
+       
     }
 
     public void returnBook(String userId, String bookId){
