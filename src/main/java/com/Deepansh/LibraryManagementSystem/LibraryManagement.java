@@ -23,8 +23,8 @@ public class LibraryManagement {
 
     public boolean canBorrow(String userId,String bookId){ 
 
-       Map<String,LocalDate> borrowedBooks = um.borrowedBooksbyUser.computeIfAbsent(bookId, k-> new HashMap<>());
-       if(getBookStatus(bookId)==BookStatus.NOT_AVAILABLE||borrowedBooks.containsKey(bookId)){
+       Map<String,LocalDate> borrowedBooks = um.borrowedBooksbyUser.computeIfAbsent(userId, k-> new HashMap<>());
+       if(getBookStatus(bookId)!=BookStatus.AVAILABLE||borrowedBooks.containsKey(bookId)){
         return false;
     }
 

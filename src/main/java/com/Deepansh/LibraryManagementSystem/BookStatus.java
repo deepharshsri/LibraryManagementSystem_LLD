@@ -7,5 +7,5 @@ public enum BookStatus {
 
     AVAILABLE,
     NOT_AVAILABLE,
-    AVAILABLE_LATE
+    AVAILABLE_LATER
 }

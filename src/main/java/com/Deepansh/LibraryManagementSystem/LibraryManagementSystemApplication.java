@@ -12,7 +12,7 @@ public class LibraryManagementSystemApplication {
 		UserManagement userManagement = new UserManagement();
 		User u1=userManagement.createUser("Deepansh","1234567890");
 		BookManagement bookManagement = new BookManagement();
-		Book b1=bookManagement.createBook("Java","1",0);
+		Book b1=bookManagement.createBook("Java","1",1);
 		LibraryManagement libraryManagement = new LibraryManagement(bookManagement,userManagement);
 
 		boolean res=libraryManagement.canBorrow(u1.getId(),b1.getId());

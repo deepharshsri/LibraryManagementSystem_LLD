@@ -16,8 +16,7 @@ public class UserManagement {
     }
 
     public void addBookToUserList(String bookId,String userId){
-        borrowedBooksbyUser.put(userId,new HashMap<>());
-        borrowedBooksbyUser.get(userId).put(bookId,LocalDate.now());
+        borrowedBooksbyUser.computeIfAbsent(userId,k-> new HashMap<>()).put(bookId,LocalDate.now());
     }
 
     public void removeBookFromUser(String bookId,String userId){
