@@ -16,10 +16,21 @@ public class LibraryManagementSystemApplication {
 		LibraryManagement libraryManagement = new LibraryManagement(bookManagement,userManagement);
 
 		boolean res=libraryManagement.canBorrow(u1.getId(),b1.getId());
-
-		if (res) libraryManagement.issueBook(u1.getId(),b1.getId());
+  
+		if (res) {
+			System.out.println("Can borrow");
+			libraryManagement.issueBook(u1.getId(),b1.getId());
+		}
 		else System.out.println("Cannot issue book");
-
+        User u2=userManagement.createUser("Sharma", "0987654321");
+		boolean res1=libraryManagement.canBorrow(u1.getId(),b1.getId());
+  
+		if (res1) {
+			System.out.println("Can borrow");
+			libraryManagement.issueBook(u1.getId(),b1.getId());
+		}
+		else System.out.println("Cannot issue book");
+	
 		
 	}
 

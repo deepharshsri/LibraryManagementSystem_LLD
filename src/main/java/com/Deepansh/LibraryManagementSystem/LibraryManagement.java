@@ -18,15 +18,20 @@ public class LibraryManagement {
     }
 
     public BookStatus getBookStatus(String bookId){
-        return bm.getBookQuantity(bookId)>0?BookStatus.AVAILABLE:BookStatus.NOT_AVAILABLE;
+        return bm.books.containsKey(bookId)?(bm.getBookQuantity(bookId)>0?BookStatus.AVAILABLE:BookStatus.AVAILABLE_LATER):
+BookStatus.NOT_AVAILABLE;
     }
 
     public boolean canBorrow(String userId,String bookId){ 
-
-       Map<String,LocalDate> borrowedBooks = um.borrowedBooksbyUser.computeIfAbsent(userId, k-> new HashMap<>());
-       if(getBookStatus(bookId)!=BookStatus.AVAILABLE||borrowedBooks.containsKey(bookId)){
+       BookStatus status = getBookStatus(bookId);
+       if(status==BookStatus.NOT_AVAILABLE) {
+        System.out.println("Book is not available in our library");
         return false;
-    }
+       }
+       if(status==BookStatus.AVAILABLE_LATER) {
+        System.out.println("Book will be available later after : "+ borrowerListByBookId.get(bookId).get(userId).plusDays(returnDate));
+        return false;
+       }        
 
     return true;
     }
