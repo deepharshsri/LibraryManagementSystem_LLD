@@ -28,8 +28,10 @@ BookStatus.NOT_AVAILABLE;
         System.out.println("Book is not available in our library");
         return false;
        }
-       if(status==BookStatus.AVAILABLE_LATER) {
-        System.out.println("Book will be available later after : "+ borrowerListByBookId.get(bookId).get(userId).plusDays(returnDate));
+        if(status==BookStatus.AVAILABLE_LATER) {
+        Map<String,LocalDate> borrowerList = borrowerListByBookId.get(bookId);
+        LocalDate l=borrowerList.values().stream().sorted().toList().get(0);
+        System.out.println("Book will be available later after : "+ l.plusDays(returnDate));
         return false;
        }        
 
