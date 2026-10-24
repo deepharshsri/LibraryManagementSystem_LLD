@@ -29,9 +29,11 @@ BookStatus.NOT_AVAILABLE;
         return false;
        }
         if(status==BookStatus.AVAILABLE_LATER) {
-        Map<String,LocalDate> borrowerList = borrowerListByBookId.get(bookId);
+        Map<String,LocalDate> borrowerList = borrowerListByBookId.getOrDefault(bookId,Collections.EMPTY_MAP);
+        if(!borrowerList.isEmpty()){
         LocalDate l=borrowerList.values().stream().sorted().toList().get(0);
         System.out.println("Book will be available later after : "+ l.plusDays(returnDate));
+        }
         return false;
        }        
 
