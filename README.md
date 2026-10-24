@@ -1,83 +1,82 @@
-# Library Management System LLD
-
-**Functional Requirement :**
-
-Library Management: 
-
-1. Library Management will manage book status.
-2. Library Management will have User Management and Book Management.
-3. It will include a function to check the book's return time and who borrowed it using the book Id.
-4. It will allow members to borrow books from the library.
-5. The library will provide the book ID by book name using book management.
+# Library Management System (LLD)
+ 
+A small low-level design for a library: books with stock, members who borrow and return, and a librarian view of who holds a book and when it is due.
+ 
+## Functional Requirements
+ 
+**Library Management**
+ 
+1. Manages book status.
+2. Has a User Management and a Book Management.
+3. Provides a function to check a book's return time and who borrowed it, using the book ID.
+4. Allows members to borrow books from the library.
+5. Gets the book ID from a book name through Book Management.
 6. Non-members can read only inside the library.
-
-Book Management
-
-1. Books have an ID, a name.
-2. Book Management will have a map of book id and quantity.
-3. Book availability is based on the quantity available in the library, whether it is issued or not.
-4. Book Status is of Enum type 
-    1. Available: Book is available to borrow.
-    2.  Not_Available: Book is not available at the library.
-    3.  availableLater: The library has the book, but it is borrowed by someone this time.
-
-User Management
-
-1. A user can become a member of the library to borrow books.
+**Book Management**
+ 
+1. A book has an ID and a name.
+2. Keeps a map of book ID to quantity (copies currently on the shelf).
+3. Availability is based on the quantity on the shelf.
+4. Book status is an enum:
+   - `AVAILABLE`: the book can be borrowed.
+   - `NOT_AVAILABLE`: the library does not have the book.
+   - `AVAILABLE_LATER`: the library has the book, but every copy is borrowed right now.
+**User Management**
+ 
+1. A user can become a member of the library.
 2. A user can be added or removed.
-3. A user will have Id, a name, a mobile number, and a list of books that he borrowed from the library, and a boolean indicating whether he is a member.
-4. A user can borrow and return a book to the library; this is handled here.
-
-**Out Of Scope:**
-
-1. Notification sent to both libraries and the borrower x days before deadline.
-2. Charges apply if not returned on time.
-3. Subscription categories like silver - only allow reading in the library, gold - allow taking books to home for a certain period and diamond allow reading in the library as well as allowed to take book at home for x+y days.
-
-**Non-Functional Requirement:** 
-
-1. Maintainability should be good enough, in future other developer easy to understand code.
-2. Scalability not in the LLD, but telling just on-demand large storage easy to scale up.
-3. Extensible- new feature can be added to software without touching existing one,
-
-Core Entities: 
-
-1. User Class - String ID(name+mobileNumber), String name,String mobile number, boolean isMember, getName(), getId(), getMobileNumber(),setMember(boolean);
-2. User Management - 
-    1. Map<userId,User> userList,
-    2. Map<mobileNumber, userId> mobileToUserID,
-    3. Map<UserID,Map<BookId, LocalDate>> borrowedBooksByUserId,
-    4. createNewUser(String,String), 
-    5. deleteUser(String)
-    6. addBookToUserList(String, String), 
-    7. removeBookFromUserList(String, String),  
-    8. findUserByMobileNumber(String)
-    9. findByUserID(String)
-    10. updateMembership(String, boolean),
-3. Book Class: String ID, String Name, getName(), getId().
-4. Book Management: 
-    1. Map<String,Book> books
-    2. Map<String,  Integer> bookQuantity, 
-    3. Map<String,String> bookNameToId , 
-    4. createBook(String,String), 
-    5. decreaseQuantity(String,Integer), 
-    6. increaseQuantity(String,Integer)
-    7. getBookByName(String)
-    8. getBookById(String)
-    9. getQuantity()
-5. BookStatus :
-    1. AVAILABLE
-    2. NOT_AVAILABLE
-    3. AVAILABLE_LATER
-6. Library Management: 
-    1. ReturnDays=7;
-    2. Map<String(BookId),Map<String, LocalDate>> borrowerListByBookId,
-    3. BookManagement bm, 
-    4. User Management um, 
-    5. getBookStatus(String),
-    6. issueBook(String, String) -it will add the user and book to a Map.
-    7. deleteBookFromUserRecord(String,String) —private
-    8. canBorrow(userId,BookId),
-    9. getListOfBorrowerbyBookId(string), 
-    10. getListOfBookIssuedByUser(String) return Map,
-    11. returnBook(String,String)
+3. A user has an ID, a name, a mobile number, and a member flag.
+4. The books a user has borrowed are tracked here, against the user ID.
+5. Borrowing and returning are coordinated by Library Management and recorded here.
+## Assumptions
+ 
+- Book names are unique; user ID is `name_mobileNumber`.
+- `quantity` means copies currently on the shelf: borrow decrements it, return increments it.
+- A book stays in the catalog at quantity 0, which is what makes it `AVAILABLE_LATER` instead of `NOT_AVAILABLE`.
+- The return period is fixed at 7 days. Only the issue date is stored; the due date is `issueDate + 7 days`.
+- Only members can take books home; reading inside the library needs no stock change.
+## Out Of Scope
+ 
+1. Notifications to the librarian and the borrower x days before the deadline.
+2. Charges for late returns.
+3. Subscription categories: silver (read inside only), gold (take home for a certain period), diamond (read inside and take home for x+y days).
+4. Borrow limit, borrowing the same book twice, deleting a user who still holds books, concurrency, search, persistence.
+## Non-Functional Requirements
+ 
+1. **Maintainability:** each class has one job, so another developer can follow the code easily.
+2. **Scalability:** not part of this LLD. Storage sits behind the managers, so it can be moved to a database that scales on demand.
+3. **Extensibility:** new features can be added without changing existing classes.
+## Class Diagram
+ 
+Add the diagram image here (for example `docs/class-diagram.png`).
+ 
+## Core Entities
+ 
+1. **User**: `id`, `name`, `mobileNumber`, `isMember`; `getId()`, `getName()`, `getMobileNumber()`, `isMember()`, `setMember(boolean)`.
+2. **Book**: `id`, `name`; `getId()`, `getName()`.
+3. **BookStatus** (enum): `AVAILABLE`, `NOT_AVAILABLE`, `AVAILABLE_LATER`.
+4. **BookManagement**
+   - Fields: `books` (id to Book), `bookQuantity` (id to count), `bookNameToId` (name to id).
+   - Methods: `createBook(id, name, quantity)`, `hasBook(id)`, `getBookById(id)`, `getBookIdByName(name)`, `getQuantity(id)`, `increaseQuantity(id, count)`, `decreaseQuantity(id, count)`.
+5. **UserManagement**
+   - Fields: `userList` (id to User), `mobileToUserId`, `borrowedBooksByUserId` (userId to bookId to issueDate).
+   - Methods: `createNewUser(name, mobile)`, `deleteUser(userId)`, `findByUserId(userId)`, `findUserByMobileNumber(mobile)`, `updateMembership(userId, boolean)`, `addBookToUserList(userId, bookId)`, `removeBookFromUserList(userId, bookId)`, `getListOfBookIssuedByUser(userId)`.
+6. **LibraryManagement**
+   - Fields: `RETURN_DAYS = 7`, `borrowerListByBookId` (bookId to userId to issueDate), `bm`, `um`.
+   - Methods: `getBookStatus(bookId)`, `canBorrow(userId, bookId)`, `issueBook(userId, bookId)`, `returnBook(userId, bookId)`, `getListOfBorrowerByBookId(bookId)`, `getListOfBookIssuedByUser(userId)`, private `deleteBookFromUserRecord(userId, bookId)`.
+## Flow
+ 
+- **Issue:** `canBorrow` (user exists, is a member, book is `AVAILABLE`), then decrease quantity, add the book to the user's list, add the user to the book's borrower list.
+- **Return:** remove the book from both records, then increase quantity.
+- **Status:** not in catalog is `NOT_AVAILABLE`, quantity above 0 is `AVAILABLE`, otherwise `AVAILABLE_LATER`.
+## Data Structures
+ 
+Hash maps keyed by ID, so lookup, add and remove are O(1) on average. The librarian view for one book is O(k), where k is the number of copies currently borrowed.
+ 
+## Run
+ 
+Plain Java, no framework:
+ 
+```
+javac -d out src/main/java/com/Deepansh/LibraryManagementSystem/*.java
+java -cp out com.Deepansh.LibraryManagementSystem.Main
